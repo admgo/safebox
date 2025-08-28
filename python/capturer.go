@@ -14,7 +14,7 @@ type Capturer struct {
 	done   chan bool
 }
 
-func NewOutputCaptureRunner() *Capturer {
+func NewOutputCapturer() *Capturer {
 	return &Capturer{
 		stdout: make(chan []byte),
 		stderr: make(chan []byte),
