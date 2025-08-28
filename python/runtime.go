@@ -21,6 +21,7 @@ func NewPythonRuntime() *PythonRuntime {
 			PythonLibPaths:     []string{},
 			PipMirrorURL:       "https://pypi.tuna.tsinghua.edu.cn/simple",
 		},
+		capturer: NewOutputCapturer(),
 	}
 }
 
