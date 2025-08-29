@@ -26,6 +26,10 @@ func LoadSeccomp() {
 		for _, nr := range ALLOW_NETWORK_SYSCALLS {
 			must(filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActErrno.SetReturnCode(1)))
 		}
+	} else {
+		for _, nr := range ALLOW_NETWORK_SYSCALLS {
+			must(filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActAllow))
+		}
 	}
 
 	// 强制拒绝的高危调用
