@@ -21,6 +21,13 @@ var ALLOW_SYSCALLS = []int32{
 	syscall.SYS_PREAD64,
 	syscall.SYS_PRLIMIT64,
 	syscall.SYS_SET_TID_ADDRESS,
+	SYS_DUP,
+	SYS_GETEGID,
+	SYS_GETEUID,
+	SYS_GETGID,
+	SYS_LSTAT,
+	SYS_READLINK,
+	SYS_STAT,
 
 	// thread
 	syscall.SYS_FUTEX,
