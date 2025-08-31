@@ -37,7 +37,7 @@ func NewPythonRuntime() *PythonRuntime {
 			MaxWorkers:         10,
 			MaxRequests:        100,
 			WorkerTimeout:      10,
-			pythonPath:         "/lib/py3",
+			pythonPath:         "python3",
 			PythonPipMirrorURL: "https://pypi.tuna.tsinghua.edu.cn/simple",
 			PythonLibPaths:     []string{},
 			PipMirrorURL:       "https://pypi.tuna.tsinghua.edu.cn/simple",
