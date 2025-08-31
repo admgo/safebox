@@ -24,23 +24,23 @@ func LoadSeccomp() error {
 		return err
 	}
 	for _, nr := range ALLOW_SYSCALLS {
-		return filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActAllow)
+		filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActAllow)
 	}
 
 	// 是否禁用网络（强烈建议禁用）
 	if os.Getenv("SECWRAP_NONET") == "1" {
 		for _, nr := range ALLOW_NETWORK_SYSCALLS {
-			return filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActErrno.SetReturnCode(1))
+			filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActErrno.SetReturnCode(1))
 		}
 	} else {
 		for _, nr := range ALLOW_NETWORK_SYSCALLS {
-			return filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActAllow)
+			filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActAllow)
 		}
 	}
 
 	// 强制拒绝的高危调用
 	for _, nr := range DENY_SYSCALLS {
-		return filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActErrno.SetReturnCode(1))
+		filter.AddRule(seccomp.ScmpSyscall(nr), seccomp.ActErrno.SetReturnCode(1))
 	}
 
 	return filter.Load()
