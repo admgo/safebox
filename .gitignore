@@ -20,3 +20,6 @@
 
 # Virtual Environment
 .venv
+
+# build file
+.build
