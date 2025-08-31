@@ -1,13 +1,34 @@
 package python
 
 import (
-	"context"
+	"os"
 	"os/exec"
+	"strings"
+	"text/template"
+
+	"github.com/google/uuid"
 )
 
 type PythonRuntime struct {
-	config   *PythonRuntimeConfig
-	capturer *Capturer
+	config    *PythonRuntimeConfig
+	capturer  *Capturer
+	workspace *Workspace
+}
+
+type PytemplateData struct {
+	Code string
+}
+
+func (r *PytemplateData) Indent(spaces int, v string) string {
+	pad := strings.Repeat(" ", spaces)
+	lines := strings.Split(v, "\n")
+	for i, line := range lines {
+		// do not indent in first line
+		if line != "" && i > 0 {
+			lines[i] = pad + line
+		}
+	}
+	return strings.Join(lines, "\n")
 }
 
 func NewPythonRuntime() *PythonRuntime {
@@ -16,12 +37,13 @@ func NewPythonRuntime() *PythonRuntime {
 			MaxWorkers:         10,
 			MaxRequests:        100,
 			WorkerTimeout:      10,
-			pythonPath:         "python3",
+			pythonPath:         "/lib/py3",
 			PythonPipMirrorURL: "https://pypi.tuna.tsinghua.edu.cn/simple",
 			PythonLibPaths:     []string{},
 			PipMirrorURL:       "https://pypi.tuna.tsinghua.edu.cn/simple",
 		},
-		capturer: NewOutputCapturer(),
+		capturer:  NewOutputCapturer(),
+		workspace: NewWorkspace("/Users/kenley/tmp"),
 	}
 }
 
@@ -33,9 +55,43 @@ func (r *PythonRuntime) Version() string {
 	return ""
 }
 
+func (r *PythonRuntime) dump(code string) (string, error) {
+	data := &PytemplateData{
+		Code: code,
+	}
+
+	// read template file
+	tmpl, err := template.ParseFiles("template/python.tmpl")
+	if err != nil {
+		return "", err
+	}
+
+	// generate a python script
+	filename := uuid.New().String() + ".py"
+	fullname := r.workspace.scriptDir + "/" + filename
+	file, err := os.Create(fullname)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	err = tmpl.Execute(file, data)
+	if err != nil {
+		return "", err
+	}
+	return fullname, nil
+}
+
 func (r *PythonRuntime) Run(code string) (chan []byte, chan []byte, chan bool, error) {
-	cmd := exec.CommandContext(context.Background(), "go", "test", "-run", "TestLongTimeOutput")
-	err := r.capturer.CaptureOutput(cmd)
+	fullname, err := r.dump(code)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	cmd := exec.Command(r.config.pythonPath, fullname)
+	cmd.Dir = r.workspace.workDir
+
+	err = r.capturer.CaptureOutput(cmd)
 	if err != nil {
 		return nil, nil, nil, err
 	}

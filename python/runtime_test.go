@@ -1,14 +1,27 @@
 package python
 
 import (
+	_ "embed"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 )
 
+var code = []byte(`
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# @Time: 2025/8/31 16:17
+# @Author: Kenley Wang
+# @FileName: test.py
+
+print("hello")
+`)
+
 func TestRuntime_Exec(t *testing.T) {
-	pyruntime := &PythonRuntime{}
-	stdout, stderr, done, err := pyruntime.Run("s")
+	pyruntime := NewPythonRuntime()
+	stdout, stderr, done, err := pyruntime.Run(string(code))
 	if err != nil {
 		t.Error(err)
 	}
@@ -22,17 +35,41 @@ func TestRuntime_Exec(t *testing.T) {
 	for {
 		select {
 		case <-done:
-			fmt.Sprintf("stdout: %s\nstderr: %s\n", stdout_str, stderr_str)
+			fmt.Printf("stdout: %s\nstderr: %s\n", stdout_str, stderr_str)
+			return
 		case out := <-stdout:
+			fmt.Printf("%s", string(out))
 			stdout_str += string(out)
-		case err := <-stderr:
-			stderr_str += string(err)
+		case er := <-stderr:
+			fmt.Printf("%s", string(er))
+			stderr_str += string(er)
 		}
 	}
 }
+
+var codeS = `
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# @Time: 2025/8/31 16:17
+# @Author: Kenley Wang
+# @FileName: test.py
+
+print("hello")
+`
+
+func TestGenerateCode(t *testing.T) {
+	pyruntime := NewPythonRuntime()
+	genCode, err := pyruntime.dump(codeS)
+	fmt.Println(genCode)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestLongTimeOutput(t *testing.T) {
 	ticker := time.NewTicker(1 * time.Second)
-	timer := time.NewTimer(30 * time.Second)
+	timer := time.NewTimer(3 * time.Second)
 	defer ticker.Stop()
 	defer timer.Stop()
 
@@ -44,4 +81,7 @@ func TestLongTimeOutput(t *testing.T) {
 			return
 		}
 	}
+}
+func TestWhereisTmp(t *testing.T) {
+	fmt.Println(os.TempDir())
 }
