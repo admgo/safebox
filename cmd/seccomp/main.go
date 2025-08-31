@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/admgo/safebox/internal/seccomp"
 	"log"
 	"os"
 	"syscall"
+
+	"github.com/admgo/safebox/internal/seccomp"
 )
 
 func main() {
