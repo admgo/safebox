@@ -3,7 +3,7 @@
 
 # @Time: 2025/8/28 11:31
 # @Author: Kenley Wang
-# @FileName: test.py
+# @FileName: python.tmpl
 
 import ctypes
 import os
@@ -17,13 +17,12 @@ def excepthook(type, value, tb):
 
 sys.excepthook = excepthook
 
-lib = ctypes.CDLL("./python.so")
-lib.LoadSeccomp.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool]
+lib = ctypes.CDLL("/bin/seccomp.so")
+lib.LoadSeccomp.argtypes = []
 lib.LoadSeccomp.restype = None
 
 lib.LoadSeccomp()
 
-
-code = open("./test.py").read()
-
-exec(code)
+if __name__ == "__main__":
+    {{.Indent 4 .Code}}
+    main()
