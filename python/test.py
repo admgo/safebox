@@ -18,10 +18,10 @@ def excepthook(type, value, tb):
 sys.excepthook = excepthook
 
 lib = ctypes.CDLL("./python.so")
-lib.DifySeccomp.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool]
-lib.DifySeccomp.restype = None
+lib.LoadSeccomp.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_bool]
+lib.LoadSeccomp.restype = None
 
-lib.DifySeccomp()
+lib.LoadSeccomp()
 
 
 code = open("./test.py").read()
