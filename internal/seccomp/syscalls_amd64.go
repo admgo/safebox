@@ -15,20 +15,6 @@ var ALLOW_SYSCALLS = []int32{
 	syscall.SYS_NEWFSTATAT, syscall.SYS_IOCTL, syscall.SYS_LSEEK, syscall.SYS_GETDENTS64,
 	syscall.SYS_WRITE, syscall.SYS_CLOSE, syscall.SYS_OPENAT, syscall.SYS_READ,
 
-	syscall.SYS_ACCESS,
-	syscall.SYS_ARCH_PRCTL,
-	syscall.SYS_EXECVE,
-	syscall.SYS_PREAD64,
-	syscall.SYS_PRLIMIT64,
-	syscall.SYS_SET_TID_ADDRESS,
-	syscall.SYS_DUP,
-	syscall.SYS_GETEGID,
-	syscall.SYS_GETEUID,
-	syscall.SYS_GETGID,
-	syscall.SYS_LSTAT,
-	syscall.SYS_READLINK,
-	syscall.SYS_STAT,
-
 	// thread
 	syscall.SYS_FUTEX,
 	// memory
