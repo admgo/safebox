@@ -23,3 +23,5 @@
 
 # build file
 .build
+
+.devcontainer/*/.features.temp.dockerfile
