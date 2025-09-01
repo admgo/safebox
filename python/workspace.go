@@ -8,7 +8,7 @@ import (
 type Workspace struct {
 	workDir   string
 	scriptDir string
-	LibDir    string
+	libDir    string
 }
 
 func NewWorkspace(workDir string) *Workspace {
@@ -37,7 +37,7 @@ func (w *Workspace) setup() error {
 	if err := os.MkdirAll(libDir, 0o755); err != nil {
 		return err
 	}
-	w.LibDir = libDir
+	w.libDir = libDir
 	return nil
 }
 
