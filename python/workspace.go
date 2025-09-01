@@ -2,7 +2,6 @@ package python
 
 import (
 	"os"
-	"path/filepath"
 )
 
 type Workspace struct {
@@ -23,21 +22,9 @@ func NewWorkspace(workDir string) *Workspace {
 }
 
 func (w *Workspace) setup() error {
-
-	baseDir := filepath.Join(w.workDir, "python")
-
-	// create script directory
-	scriptDir := filepath.Join(baseDir, "scripts")
-	if err := os.MkdirAll(scriptDir, 0o755); err != nil {
+	if err := os.MkdirAll(w.workDir, 0o755); err != nil {
 		return err
 	}
-	w.scriptDir = scriptDir
-	// create script directory
-	libDir := filepath.Join(baseDir, "lib")
-	if err := os.MkdirAll(libDir, 0o755); err != nil {
-		return err
-	}
-	w.libDir = libDir
 	return nil
 }
 

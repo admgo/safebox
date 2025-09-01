@@ -3,6 +3,7 @@ package python
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -31,8 +32,8 @@ func (r *PytemplateData) Indent(spaces int, v string) string {
 	return strings.Join(lines, "\n")
 }
 
-func NewPythonRuntime() *PythonRuntime {
-	return &PythonRuntime{
+func NewPythonRuntime(w *Workspace) *PythonRuntime {
+	r := &PythonRuntime{
 		config: &PythonRuntimeConfig{
 			MaxWorkers:         10,
 			MaxRequests:        100,
@@ -43,16 +44,33 @@ func NewPythonRuntime() *PythonRuntime {
 			PipMirrorURL:       "https://pypi.tuna.tsinghua.edu.cn/simple",
 		},
 		capturer:  NewOutputCapturer(),
-		workspace: NewWorkspace("/Users/kenley/tmp"),
+		workspace: w,
 	}
+	err := r.initialize()
+	if err != nil {
+		return nil
+	}
+	return r
 }
 
-func (r *PythonRuntime) Name() string {
-	return "python"
-}
+func (r *PythonRuntime) initialize() error {
+	runtimeDir := filepath.Join(r.workspace.workDir, "python")
 
-func (r *PythonRuntime) Version() string {
-	return ""
+	scriptDir := filepath.Join(runtimeDir, "scripts")
+	if err := os.MkdirAll(scriptDir, 0o755); err != nil {
+		return err
+	}
+
+	cmd := exec.Command(r.config.pythonPath, "load_standard_library.py", runtimeDir)
+	// Connect stdout/stderr to this process, so errors show up properly
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Run synchronously
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *PythonRuntime) dump(code string) (string, error) {
