@@ -16,7 +16,9 @@ var code = []byte(`
 # @Author: Kenley Wang
 # @FileName: test.py
 
-print("hello")
+def main():
+	import time
+	print(time.time())
 `)
 
 func TestRuntime_Exec(t *testing.T) {
@@ -39,10 +41,8 @@ func TestRuntime_Exec(t *testing.T) {
 			fmt.Printf("stdout: %s\nstderr: %s\n", stdout_str, stderr_str)
 			return
 		case out := <-stdout:
-			fmt.Printf("%s", string(out))
 			stdout_str += string(out)
 		case er := <-stderr:
-			fmt.Printf("%s", string(er))
 			stderr_str += string(er)
 		}
 	}

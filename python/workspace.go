@@ -5,9 +5,7 @@ import (
 )
 
 type Workspace struct {
-	workDir   string
-	scriptDir string
-	libDir    string
+	workDir string
 }
 
 func NewWorkspace(workDir string) *Workspace {
