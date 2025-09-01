@@ -11,9 +11,11 @@ import (
 )
 
 type PythonRuntime struct {
-	config    *PythonRuntimeConfig
-	capturer  *Capturer
-	workspace *Workspace
+	config     *PythonRuntimeConfig
+	capturer   *Capturer
+	workspace  *Workspace
+	scriptsDir string
+	runtimeDir string
 }
 
 type PytemplateData struct {
@@ -54,14 +56,16 @@ func NewPythonRuntime(w *Workspace) *PythonRuntime {
 }
 
 func (r *PythonRuntime) initialize() error {
-	runtimeDir := filepath.Join(r.workspace.workDir, "python")
+	// the python runtime will install in <work_dir>/python
+	r.runtimeDir = filepath.Join(r.workspace.workDir, "python")
 
-	scriptDir := filepath.Join(runtimeDir, "scripts")
-	if err := os.MkdirAll(scriptDir, 0o755); err != nil {
+	// the scripts will in <work_dir>/python/scripts
+	r.scriptsDir = filepath.Join(r.runtimeDir, "scripts")
+	if err := os.MkdirAll(r.scriptsDir, 0o755); err != nil {
 		return err
 	}
 
-	cmd := exec.Command(r.config.pythonPath, "load_standard_library.py", runtimeDir)
+	cmd := exec.Command(r.config.pythonPath, "load_standard_library.py", r.runtimeDir)
 	// Connect stdout/stderr to this process, so errors show up properly
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -86,7 +90,7 @@ func (r *PythonRuntime) dump(code string) (string, error) {
 
 	// generate a python script
 	filename := uuid.New().String() + ".py"
-	fullname := r.workspace.scriptDir + "/" + filename
+	fullname := r.scriptsDir + "/" + filename
 	file, err := os.Create(fullname)
 	if err != nil {
 		return "", err
@@ -107,7 +111,7 @@ func (r *PythonRuntime) Run(code string) (chan []byte, chan []byte, chan bool, e
 	}
 
 	cmd := exec.Command(r.config.pythonPath, fullname)
-	cmd.Dir = r.workspace.workDir
+	cmd.Dir = r.runtimeDir
 
 	err = r.capturer.CaptureOutput(cmd)
 	if err != nil {
