@@ -20,7 +20,8 @@ print("hello")
 `)
 
 func TestRuntime_Exec(t *testing.T) {
-	pyruntime := NewPythonRuntime()
+	w := NewWorkspace("/sandbox")
+	pyruntime := NewPythonRuntime(w)
 	stdout, stderr, done, err := pyruntime.Run(string(code))
 	if err != nil {
 		t.Error(err)
@@ -59,9 +60,19 @@ print("hello")
 `
 
 func TestGenerateCode(t *testing.T) {
-	pyruntime := NewPythonRuntime()
+	w := NewWorkspace("/sandbox")
+	pyruntime := NewPythonRuntime(w)
 	genCode, err := pyruntime.dump(codeS)
 	fmt.Println(genCode)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestInitializeRuntime(t *testing.T) {
+	w := NewWorkspace("/sandbox")
+	pyruntime := NewPythonRuntime(w)
+	err := pyruntime.initialize()
 	if err != nil {
 		t.Error(err)
 	}
@@ -82,6 +93,7 @@ func TestLongTimeOutput(t *testing.T) {
 		}
 	}
 }
+
 func TestWhereisTmp(t *testing.T) {
 	fmt.Println(os.TempDir())
 }
